@@ -92,6 +92,7 @@ if not LINUX:
     flash_saved_code_sector = 11
   # F4 has different page sizes in different places
   flash_saved_code_pages = (flash_needed+flash_page_size-1)/flash_page_size
+  flash_saved_code_length = "(FLASH_PAGE_SIZE*FLASH_SAVED_CODE_PAGES)"
   total_flash = board.chip["flash"]*1024
 
   if "saved_code" in board.chip:
@@ -100,6 +101,8 @@ if not LINUX:
     flash_saved_code_sector = board.chip["saved_code"]["page_number"]
     flash_saved_code_pages = board.chip["saved_code"]["pages"]
     flash_available_for_code = board.chip["saved_code"]["flash_available"]*1024
+    if "length" in board.chip["saved_code"]:
+      flash_saved_code_length = board.chip["saved_code"]["length"]
   else:
     flash_saved_code_start = "(FLASH_START + FLASH_TOTAL - FLASH_SAVED_CODE_LENGTH)"
     flash_available_for_code = total_flash - (flash_saved_code_pages*flash_page_size)
@@ -254,7 +257,7 @@ else:
     codeOut("#define BOOTLOADER_SIZE                 "+str(common.get_bootloader_size(board)))
     codeOut("#define ESPRUINO_BINARY_ADDRESS         "+hex(common.get_espruino_binary_address(board)))
   codeOut("")
-  codeOut("#define FLASH_SAVED_CODE_LENGTH (FLASH_PAGE_SIZE*FLASH_SAVED_CODE_PAGES)")
+  codeOut("#define FLASH_SAVED_CODE_LENGTH "+str(flash_saved_code_length))
   codeOut("#define FLASH_SAVED_CODE_START "+str(flash_saved_code_start))
   codeOut("#define FLASH_MAGIC_LOCATION (FLASH_SAVED_CODE_START + FLASH_SAVED_CODE_LENGTH - 4)")
   codeOut("#define FLASH_MAGIC 0xDEADBEEF")
